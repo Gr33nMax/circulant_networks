@@ -15,3 +15,10 @@ The file with the main developed algorithm is called ***"sequent.py"***.
 Also in this project are files with other implementations of the routing algorithm.
 
 ***"polynom.py"***  goes through a lot of cases and gives guaranteed a sure result, but it takes a lot of resources on a chip.
+
+## Requirements
+You must have:
+- Python 3.6+
+- NumPy 
+- SciPy
+- MatPlotLib
