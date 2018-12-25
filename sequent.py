@@ -29,6 +29,8 @@ def check_node(num_nodes: int, node: int) -> int:
 def find_min_len(tlst: list) -> (int, int):
     """
     This function finds minimal distances to the end node.
+    It takes a list of distances and returns a pair:
+    (the generator itself, the number of steps along the given generator).
     """
     min_t_high   = 10e5
     min_t_low    = 10e5
@@ -54,6 +56,16 @@ def find_min_len(tlst: list) -> (int, int):
 
 
 def calc_L(N: int, N1: int, N2: int) -> list:
+    """
+    Calculation of 4 distances:
+    1. The minimum distance from the initial vertex to the end.
+    2. The minimum distance from the initial vertex to the final (when moving
+        in the other direction).
+    3. A distance after a full turn around the graph in the direction of
+    the smallest distance from initial vertex to the end;
+    4. A distance after a full turn around the graph in the direction of
+    the greatest distance from initial vertex to the end.
+    """
     L = [
         min(abs(N2 - N1), N - abs(N2 - N1)),
         max(abs(N2 - N1), N - abs(N2 - N1)),
@@ -62,7 +74,11 @@ def calc_L(N: int, N1: int, N2: int) -> list:
     ]
     return L
 
-def fail_alg(N, N1, N2, S, prev_step, the_first=1):
+def main_alg(N: int, N1: int, N2: int, S: int, prev_step: int,
+             the_first: int=1) -> int:
+    """
+    The main algorithm implementation.
+    """
     remove_pos = 0
     sl = [S[0], S[1], S[2], -S[0], -S[1], -S[2]]
     remove_flag = False
@@ -131,7 +147,6 @@ def fail_alg(N, N1, N2, S, prev_step, the_first=1):
 
         min_lengths.append(find_min_len(min_d))
 
-    f = 1  # for debug
     near_result = min(min_lengths, key=lambda  r: r[0])[1]
     result_generatrix = near_result
     if near_result != 0:
@@ -155,7 +170,11 @@ def fail_alg(N, N1, N2, S, prev_step, the_first=1):
     return result_generatrix
 
 
-def check_generatrices(N: int, gLst: list):
+def check_generatrices(N: int, gLst: list) -> tuple:
+    """
+    Check generatrices. Its shouldn't be greater than the number of vertices
+    and greater than the number of vertices divided by 2.
+    """
     for idx, gen in enumerate(gLst):
         if gen > N:
             gen %= N
@@ -172,21 +191,19 @@ def check_generatrices(N: int, gLst: list):
     return tuple(gLst)
 
 
-def start_alg(N, N1, N2, S):
-    """ Запуск алгоритма для поиска маршрута из N1 в N2 """
+def start_alg(N: int, N1: int, N2: int, S: int) -> list:
+    """ Start algorithm to find a way from N1 node to N2. """
     S = check_generatrices(N, list(S))
     if not S:
         return -1
-
     visited = list()
     next_step = 0
     visited.append(N1)
-    # infinity_cycles = False
     num_iterations = 0
     the_first = N1
     while N1 != N2:
         num_iterations += 1
-        next_step = fail_alg(N, N1, N2, S, next_step, the_first=the_first)
+        next_step = main_alg(N, N1, N2, S, next_step, the_first=the_first)
         N1 = check_node(N, N1 + next_step)
         if num_iterations > 10e5:
             return list()
@@ -213,11 +230,14 @@ def find_max_diameter(lst_lsts):
     return len(max(lst_lsts, key=len)) - 1
 
 
-def read_from_csv():
-    # В текущей директории должна находиться папка 'OptCirculants' c
-    # csv-файлами таблиц, доступных по ссылке:
-    # https://www.kaggle.com/gre3nlime/3dimensional-optimal-circulants
-    """ Чтение и обработка данных из csv файлов """
+def read_from_csv() -> bool:
+    """
+    Reading and processing csv-files.
+    It also builds graphs of dependencies of the program execution time
+    on the number of vertices, as well as the dependence of the distance
+    difference calculated using the "Sequent" algorithm and
+    the Dijkstra algorithm.
+    """
     if not os.path.exists('OptCirculants'):
         print("Error! Can't find folder 'OptCirculants'!\n"
               "Please, create a folder 'OptCirculants' with Optimal "
@@ -308,17 +328,17 @@ def read_from_csv():
     return True
 
 
-def launch_algorithm(start=10, end=100, S=(2, 3, 4),
-                     print_graph_time=True,
-                     print_graph_diameter=True,
-                     draw_trend_line_time=True,
-                     draw_trend_line_diameter=True):
+def launch_algorithm(start: int=10, end: int=100, S: tuple=(2, 3, 4),
+                     print_graph_time: bool=True,
+                     print_graph_diameter: bool=True,
+                     draw_trend_line_time: bool=True,
+                     draw_trend_line_diameter: bool=True):
     """
-     Запуск алгоритма с отрисовкой двух графиков зависимости
-        1) времени выполнения алгоритма от числа вершин;
-        2) диаметра от числа вершин.
-     Результаты сохраняются в текущую папку в виде изображения с названием
-     'fig.png'
+    Running the algorithm with drawing two graphs of dependencies
+         1) the execution time of the algorithm on the number of vertices;
+         2) the diameter on the number of vertices.
+      The results are saved to the current folder as an image with the name:
+      'figX.png'
     """
     N1 = 1
     if start < max(S):
