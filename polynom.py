@@ -1,9 +1,3 @@
-# N, S1, S2, S3 = map(int, input("Enter N, S1, S2, S3 --> ").split())
-# N1, N2 = map(int, input("Enter N1, N2 --> ").split())
-# L = abs(N2 - N1)
-# if (N1 > N2):
-#     assert("N1 > N2!")
-#     exit(-1)
 import time
 from pprint import pprint
 
@@ -21,6 +15,7 @@ N1 = 1
 min_coeffs = tuple()
 all_coeffs = list()
 
+print(f'Circulant C({N}; {S1}, {S2}, {S3}).')
 start_time = time.time()
 for N2 in range(1, N // 2 + 2):
     L = abs(N2 - N1)
@@ -37,7 +32,7 @@ for N2 in range(1, N // 2 + 2):
                         min_coeffs = (x, y, z)
     # print(f"1-{N2} --> a1 = %d, a2 = %d, a3 = %d." % min_coeffs)
     all_coeffs.append(min_coeffs)
-print('--- %f seconds ---' % (time.time() - start_time))
+# print('--- %f seconds ---' % (time.time() - start_time))
 
 min_all_tups = 10e5
 max_all_tups = -10e5
@@ -49,11 +44,14 @@ for tup in all_coeffs:
     if max_tup > max_all_tups:
         max_all_tups = max_tup
 
-print('Min: {:d}, Max: {:d}.'.format(min_all_tups, max_all_tups))
+# print('Min: {:d}, Max: {:d}.'.format(min_all_tups, max_all_tups))
 
 extension_all_coeffs = list()
 
-def negate_tuple(tmp: tuple):
+def negate_tuple(tmp: tuple) -> tuple:
+    """
+    Reversing tuple values.
+    """
     return -tmp[0], -tmp[1], -tmp[2]
 
 for t in all_coeffs:
@@ -66,5 +64,5 @@ extension_all_coeffs.pop(0)
 extension_all_coeffs.reverse()
 all_coeffs.extend(extension_all_coeffs)
 
-# for i, el in enumerate(all_coeffs):
-#     print(f"1-{i+1} --> a1 = %d, a2 = %d, a3 = %d." % el)
+for i, el in enumerate(all_coeffs):
+    print(f"1-{i+1} --> a1 = %d, a2 = %d, a3 = %d." % el)
