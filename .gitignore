@@ -4,6 +4,7 @@
 *.ilk
 *.pdb
 *.log
+*.cpp
 *.h
 *.idb
 *.bat
