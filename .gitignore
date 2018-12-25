@@ -19,3 +19,6 @@
 *.filters
 OtherCirculants/Circulant_Graphs_05_11_2018/Circulant_Graphs_05.11.2018/.vs/Circulant Graphs/v15/.suo
 *.db
+deep_fail.py
+native_fail.py
+other_fail.py
