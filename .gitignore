@@ -1,0 +1,20 @@
+
+*.tlog
+*.obj
+*.ilk
+*.pdb
+*.log
+*.h
+*.idb
+*.bat
+*.ipdb
+*.iobj
+*.exe
+*.htm
+*.sln
+*.vcxproj
+*.user
+*.vspscc
+*.filters
+OtherCirculants/Circulant_Graphs_05_11_2018/Circulant_Graphs_05.11.2018/.vs/Circulant Graphs/v15/.suo
+*.db
