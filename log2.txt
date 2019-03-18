@@ -1,0 +1,9 @@
+CALCULATION LOG
+Pic: pic0.4383960972665426.png with misses.
+s1 = 1 in 419 circulants.
+Percentage s1 = 1 to all circulants: 0.01480617689671013
+Num all diameters: 28299.
+Num diff diameters: 28014
+Percentage diff. diam / num all diam: 0.9899289727552211.
+Missed_circulants: 0.Unreachable routes: 285
+Errors: 0.

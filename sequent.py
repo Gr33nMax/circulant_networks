@@ -2,6 +2,7 @@ import time
 import os
 import re
 import csv
+import random
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.pylab as pylab
@@ -254,7 +255,11 @@ def read_from_csv() -> bool:
 
     x = list()
     y = list()
+    sec_y = list()
+    dij_y = list()
     num_errors = 0
+    unreachable_routes = 0
+    missed_circulants = 0
 
     num_circulants_with_s0_eq_1 = 0
 
@@ -267,16 +272,25 @@ def read_from_csv() -> bool:
                     continue
                 if row[0].startswith('stop'):
                     break
+                num_circulant += 1
                 re_finder = re.search("\d+, \d+, \d+, \d+", row[1])
                 re_result = re_finder.group(0).split(',')
                 S = [0, 0, 0]
                 N, S[0], S[1], S[2] = map(int, re_result)
+                print(f"C({N}, {S[0]}, {S[1]}, {S[2]}).")
                 all_vertices_list = list()
                 error_flag = False
-
                 if S[0] == 1:
                     num_circulants_with_s0_eq_1 += 1
-
+                # unreachable routes
+                if N % 2 == 0 and gcd(gcd(S[0], S[1]), S[2]) != 1:
+                    unreachable_routes += 1
+                    # continue
+                # long routes
+                if S[1] == 2 * S[0] or \
+                        (S[1] - S[0] == S[2] - S[1]) and N % 2 == 0:
+                    missed_circulants += 1
+                    # continue
                 for N2 in range(2, N + 1):
                     vertices = start_alg(N, N1, N2, S)
                     if not vertices:
@@ -289,31 +303,31 @@ def read_from_csv() -> bool:
                 if -1 in all_vertices_list:
                     continue
                 max_diameter = find_max_diameter(all_vertices_list)
+                sec_y.append(max_diameter)
                 opt_diameter = int(row[2])
-
+                dij_y.append(opt_diameter)
                 x.append(num_circulant)
-                circulant_signatures.append(f'C({N}; {S[0]}, {S[1]}, {S[2]})')
-
                 y.append(max_diameter - opt_diameter)
-
-                print(f"C({N}, {S[0]}, {S[1]}, {S[2]}).")
+                circulant_signatures.append(f'C({N}; {S[0]}, {S[1]}, {S[2]})')
                 # print(f'D = {max_diameter}. Opt D = {opt_diameter}.')
                 if max_diameter - opt_diameter != 0:
                     num_diff_diameters += 1
                     list_diff_diameters.append(max_diameter - opt_diameter)
 
-                num_circulant += 1
-
     list_diff_diameters.sort(reverse=True)
     # print(f"Max diff diameters: {list_diff_diameters}")
-
-    # plt.yticks([0, 1, 2])
-    plt.plot(x, y)
+    plt.plot(x, y, label='Разность диаметров')
+    # plt.plot(x, sec_y, label='Диаметры по алгоритму "Sequent"')
+    plt.plot(x, dij_y, label='Диаметры по алгоритму Дейкстры')
+    plt.legend()
     plt.grid(True)
     # plt.xticks(np.arange(0, 26), circulant_signatures, rotation=90)
-    plt.xlim(5, 300)
-    plt.xlabel('Количество вершин')
+    plt.xlim(0, num_circulant)
+    # plt.xlabel('Количество вершин')
+    plt.xlabel('Порядковый номер циркулянта')
     plt.ylabel('D_dijkstra - D_sequent')
+    pic_name = 'pic' + str(random.random()) + '.png'
+    plt.savefig(fname=pic_name)
     plt.show()
 
     print('s1 = 1 in %d circulants.' % num_circulants_with_s0_eq_1)
@@ -323,7 +337,24 @@ def read_from_csv() -> bool:
     print('Num diff diameters: %d. ' % num_diff_diameters)
     print('Percentage diff. diam / num all diam: %f.' %
           (num_diff_diameters / num_circulant))
+    print('Missed_circulants: %d.' % missed_circulants)
+    print('Unreachable routes: %d.' % unreachable_routes)
     print('Errors: %d.' % num_errors)
+
+    f = open('log1.txt', 'w', encoding='utf-8')
+    f.write('CALCULATION LOG\n')
+    f.write(f'Pic: {pic_name} without misses.\n')
+    f.write(f's1 = 1 in {num_circulants_with_s0_eq_1} circulants.\n')
+    f.write(f'Percentage s1 = 1 to all circulants: '
+            f'{(num_circulants_with_s0_eq_1 / num_circulant)}\n')
+    f.write(f'Num all diameters: {num_circulant}.' + '\n')
+    f.write(f'Num diff diameters: {num_diff_diameters}\n')
+    f.write(f'Percentage diff. diam / num all diam: '
+            f'{(num_diff_diameters / num_circulant)}.\n')
+    f.write(f'Missed_circulants: {missed_circulants}.')
+    f.write(f'Unreachable routes: {unreachable_routes}\n')
+    f.write(f'Errors: {num_errors}.\n')
+    f.close()
 
     return True
 
